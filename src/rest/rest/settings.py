@@ -14,6 +14,31 @@ from pathlib import Path
 from datetime import timedelta
 import sys, os
 from corsheaders.defaults import default_headers
+import json
+from django.http import JsonResponse
+from django.views.defaults import server_error, page_not_found, permission_denied, bad_request
+
+def custom_error_handler(request, exception=None):
+    response_data = {'error': 'An error occurred'}
+    return JsonResponse(response_data, status=500)
+
+def custom_404_handler(request, exception=None):
+    response_data = {'error': 'Resource not found'}
+    return JsonResponse(response_data, status=404)
+
+def custom_403_handler(request, exception=None):
+    response_data = {'error': 'Permission denied'}
+    return JsonResponse(response_data, status=403)
+
+def custom_400_handler(request, exception=None):
+    response_data = {'error': 'Bad request'}
+    return JsonResponse(response_data, status=400)
+
+# Add these handlers in your URL configuration
+handler500 = 'your_project.settings.custom_error_handler'
+handler404 = 'your_project.settings.custom_404_handler'
+handler403 = 'your_project.settings.custom_403_handler'
+handler400 = 'your_project.settings.custom_400_handler'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -104,6 +129,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
@@ -130,6 +157,21 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [],
 }
 
+# settings.py
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}
 
 CORS_ORIGIN_ALLOW_ALL = True # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
 CORS_ALLOW_CREDENTIALS = True
